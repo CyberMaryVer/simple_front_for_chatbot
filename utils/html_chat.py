@@ -18,7 +18,7 @@ def st_create_html_chat(question, answer, sources,
             f"</div>"
     html += f"<div style='display: flex; flex-direction: row; justify-content: flex-end; align-items: center;'>" \
             f"<div style='display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-end;'>" \
-            f"<div style='margin: 10px; padding: 10px; border: 2px solid (176, 227, 230); background-color: rgb(176, 227, 230); color: rgb(255, 255, 255); border-radius: 5px;'>" \
+            f"<div style='margin: 10px; padding: 10px; border: 2px solid (176, 227, 230); background-color: rgb(176, 227, 230); color: rgb(0, 0, 0); border-radius: 5px;'>" \
             f"{answer}" \
             f"</div>" \
             f"</div>" \

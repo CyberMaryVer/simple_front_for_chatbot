@@ -7,8 +7,8 @@ from utils.api_requests import get_ai_assistant_response
 from utils.html_chat import st_create_html_chat
 
 EXAMPLES = ["Какие выплаты может получить работник при увольнении?",
+            "Как получить кредит для бизнеса в Москве?",
             "Как рассчитывается EBITDA?",
-            "Какие финансовые показатели бизнеса можно улучшить?",
             "Какие мероприятия для малого и среднего бизнеса проводятся в 2023 году?", ]
 
 CHAT_HI = Image.open("./img/logo-hi.jpg")
@@ -71,9 +71,7 @@ def main(admin=None):
         chat_role = st.selectbox("Выберите собеседника", [
             "Бизнес-консультант",
             "Специалист по ТК",
-            "Ивент-менеджер",
-            # "Специалист по кадрам",
-            # "Специалист по маркетингу",
+            "Помощник руководителя",
             "Финансовый консультант",
         ])
         if chat_role == "Бизнес-консультант":
@@ -88,8 +86,8 @@ def main(admin=None):
             topic = chat_role
             with chat_img:
                 st.image(CHAT_FINANCE, width=200)
-        elif chat_role == "Ивент-менеджер":
-            topic = chat_role
+        elif chat_role == "Помощник руководителя":
+            topic = "hr"
             with chat_img:
                 st.image(CHAT_EVENTS, width=200)
         else:
@@ -105,7 +103,7 @@ def main(admin=None):
             instructions = f"* Пример вопроса по тематике ТК: {EXAMPLES[0]}\n" \
                            f"* Пример вопроса по тематике Бизнес: {EXAMPLES[1]}\n" \
                            f"* Пример вопроса по тематике Финансы: {EXAMPLES[2]}\n" \
-                           f"* Пример вопроса по тематике Ивенты: {EXAMPLES[3]}\n"
+                           f"* Пример вопроса по тематике Управление: {EXAMPLES[3]}\n"
             st.markdown(instructions)
             user_input = st.text_area("question", height=100, max_chars=500, placeholder=example_input,
                                       label_visibility="collapsed")
@@ -132,7 +130,6 @@ def main(admin=None):
                     st.markdown(html, unsafe_allow_html=True)
 
                     st_format_ai_answer(answer)
-
 
                 except Exception as e:
                     st.info("Произошла ошибка. Проверьте ваш ключ и попробуйте еще раз.")
