@@ -1,75 +1,17 @@
 [//]: # (# Project: streamlit app)
 [//]: # (# File: readme.md)
-[//]: # (# Created Date: 2021-08-01 11:00:00 pm)
+[//]: # (# Created Date: 2023-05-28 11:00:00 pm)
 
 [![MIT License][license-shield]][license-url]
-
-<!-- PROJECT LOGO -->
-
-[//]: # (![Logo][product-logo])
-
-<br />
-<div align="center">
-  <a href="https://github.com/CyberMaryVer/streamlit_app">
-    <img src="images/logo.jfif" alt="Logo" width="80" height="80">
-  </a>
-
-  <h3 align="center">Streamlit App</h3>
-
-  <p align="center">
-    Streamlit App for Gloss Labelling and Validation
-    <br />
-    <a href="https://github.com/CyberMaryVer/streamlit_app"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/CyberMaryVer/streamlit_app">View Demo</a>
-    ·
-    <a href="https://github.com/CyberMaryVer/streamlit_app/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/CyberMaryVer/streamlit_app/issues">Request Feature</a>
-  </p>
-</div>
-
-
-
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ol>
-</details>
-
 
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-* Pipeline Demo Page
-[![screenshot][product-screenshot]](https://github.com/CyberMaryVer/streamlit_app)
+* Demo Page
 
+This app is designed to test [AI Assistant API](https://github.com/CyberMaryVer/ai_assistant)
 
-* Add Gloss Page
-[![screenshot2][product-screenshot2]](https://github.com/CyberMaryVer/streamlit_app)
-
-This app is designed to label and validate glosses for VSL gloss dataset.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -78,9 +20,6 @@ This app is designed to label and validate glosses for VSL gloss dataset.
 Major frameworks/libraries used in the project. 
 
 * [![Streamlit][Streamlit]][Streamlit-url]
-* [![Plotly][Plotly]][Plotly-url]
-* [![FFMPEG][Ffmpeg]][Ffmpeg-url]
-* [![Mediapipe][Mediapipe]][Mediapipe-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -99,20 +38,13 @@ To get a local copy up and running follow these simple example steps.
   ```
 * streamlit app
 * ```sh
-  streamlit run TEST_PAGE.py
+  streamlit run app.py
   ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
 Now you can open the app in your browser by typing `localhost:8501` in the address bar.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- ROADMAP -->
@@ -123,21 +55,18 @@ Now you can open the app in your browser by typing `localhost:8501` in the addre
 - [ ] Add Dataset Management page
 - [ ] Add User Management page
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 <!-- LICENSE -->
 ## License
 
 Distributed under the APACHE License. See `LICENSE.txt` for more information.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 <!-- CONTACT -->
 ## Contact
 
-Project Link: [VSL LABS](https://vsllabs.com)
+Project Link: [AI ENGINEERS](http://178.170.196.101:8080/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

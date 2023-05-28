@@ -72,13 +72,15 @@ def request_api(request, strategy='retry_strategy1', **params):
 def get_ai_assistant_response(user_input, user_id=0,
                               topic="business",
                               enrich_sources=False,
-                              tada_key="54321test"):
+                              tada_key="12345test",
+                              api=API_URL,
+                              endpoint=REQUEST_ASSISTANT):
     print(SysColors.CYAN, "Requesting...", API_URL + REQUEST_ASSISTANT, SysColors.END)
     print(SysColors.CYAN, "User input:", user_input, SysColors.END)
     topic = topic if topic in ["business", "tk"] else "business_role"
     if topic == "business_role":
         user_input = f"Ты - опытный {topic}. Ответь на вопрос:\n{user_input}"
-    request_url = f"http://localhost:8000/api/chatbot_topic/{user_id}"
+    request_url = f"{api}{endpoint}{user_id}"
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json"
