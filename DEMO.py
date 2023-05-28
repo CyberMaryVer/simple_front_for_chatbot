@@ -110,6 +110,7 @@ def main(admin=None):
             user_input = st.text_area("question", height=100, max_chars=500, placeholder=example_input,
                                       label_visibility="collapsed")
             tada_key = st.session_state.get("tada_key") or "12345test"
+            enrich_sources = True if topic == "tk" else False
 
             # Every form must have a submit button.
             submitted = st.form_submit_button("Submit")
@@ -121,7 +122,9 @@ def main(admin=None):
                         answer = get_ai_assistant_response(user_input=user_input,
                                                            user_id="demo",
                                                            topic=topic,
-                                                           tada_key=tada_key)
+                                                           tada_key=tada_key,
+                                                           enrich_sources=enrich_sources)
+                        _log_ai_answer(answer=answer, user_key=tada_key)
 
                     html = st_create_html_chat(question=user_input,
                                                answer=answer.get("answer"),
@@ -129,7 +132,7 @@ def main(admin=None):
                     st.markdown(html, unsafe_allow_html=True)
 
                     st_format_ai_answer(answer)
-                    _log_ai_answer(answer=answer, user_key=tada_key)
+
 
                 except Exception as e:
                     st.info("Произошла ошибка. Проверьте ваш ключ и попробуйте еще раз.")

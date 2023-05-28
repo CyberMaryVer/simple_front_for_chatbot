@@ -26,8 +26,8 @@ st.markdown('<style>' + open('./style.css').read() + '</style>', unsafe_allow_ht
 
 
 with st.sidebar:
-    tabs = on_hover_tabs(tabName=['Login', 'Chat'],
-                         iconName=['login', 'chat'],
+    tabs = on_hover_tabs(tabName=[ 'Chat', 'Login'],
+                         iconName=['chat', 'login'],
                          default_choice=0,
                          styles={'navtab': {'background-color': '#111',
                                             'color': '#d3d3d3',
@@ -50,5 +50,5 @@ if tabs == 'Chat':
     demo(admin=True)
 
 elif tabs == 'Login':
-    st.markdown("## Login")
+    st.markdown("## Admin Page")
     login_user()

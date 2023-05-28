@@ -27,7 +27,18 @@ def st_create_html_chat(question, answer, sources,
             f"<hr>"
     sources_html = ""
     for source in sources:
-        sources_html += f"<a href='{source}' target='_blank'>{source}</a><br>"
+        # print("\033[32m", source, "\033[0m") # green
+        if type(source) == dict:
+            # print("\033[93m", "source is dict", "\033[0m") # yellow
+            source_href = source.get("href", "")
+            source_text = source.get("name", "")
+        else:
+            # print("\033[93m", f"source is {type(source)}", "\033[0m")  # yellow
+            source_href = source
+            source_text = source
+            if len(source_text) > 50:
+                source_text = source_text[:50] + "..."
+        sources_html += f"<a href='{source_href}' target='_blank'>{source_text}</a><br>"
     html += f"<div style='display: flex; flex-direction: row; justify-content: flex-end; align-items: center;'>" \
             f"<img src='{info_icon}' style='width: 80px; height: 80px;'>" \
             f"<div style='display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-end;'>" \

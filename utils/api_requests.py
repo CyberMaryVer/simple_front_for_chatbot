@@ -71,7 +71,7 @@ def request_api(request, strategy='retry_strategy1', **params):
 
 def get_ai_assistant_response(user_input, user_id=0,
                               topic="business",
-                              enrich_sources=False,
+                              enrich_sources=True,
                               tada_key="12345test",
                               api=API_URL,
                               endpoint=REQUEST_ASSISTANT):
