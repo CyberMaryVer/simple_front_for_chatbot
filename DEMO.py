@@ -1,16 +1,14 @@
-import os.path
-import json
+import os
+
 import streamlit as st
 from time import time
 from PIL import Image
-from utils.st_auth import auth_simple
 from utils.api_requests import get_ai_assistant_response
-from utils.st_markdown import format_str
 
 EXAMPLES = ["Какие выплаты может получить работник при увольнении?",
             "Как рассчитывается EBITDA?",
             "Какие финансовые показатели бизнеса можно улучшить?",
-            "Какие мероприятия для малого и среднего бизнеса проводятся в 2023 году?",]
+            "Какие мероприятия для малого и среднего бизнеса проводятся в 2023 году?", ]
 USER_ICON = "https://nregsmp.org/eService/images/User.png"
 CHAT_ICON = "https://raw.githubusercontent.com/CyberMaryVer/ai_assistant/master/images/logo.jpg"
 CHAT_HI = Image.open("./img/logo-hi.jpg")
@@ -18,6 +16,19 @@ CHAT_BUSINESS = Image.open("./img/logo-business-2.jpg")
 CHAT_TK = Image.open("./img/logo-tk.jpg")
 CHAT_FINANCE = Image.open("./img/logo-finance-2.jpg")
 CHAT_EVENTS = Image.open("./img/logo-events.jpg")
+LOGS = "./logs"
+
+
+def _log_user_question(user_input, user_key):
+    os.makedirs(LOGS, exist_ok=True)
+    with open(f"{LOGS}/user_questions_{user_key}.txt", "a") as f:
+        f.write(f"{user_input}\n")
+
+
+def _log_ai_answer(answer, user_key):
+    os.makedirs(LOGS, exist_ok=True)
+    with open(f"{LOGS}/ai_answers_{user_key}.txt", "a") as f:
+        f.write(f"{answer}\n")
 
 
 def st_key_update():
@@ -128,9 +139,9 @@ def main(admin=None):
             st.markdown("❓**Введите свой вопрос**")
             example_input = EXAMPLES[0]
             instructions = f"* Пример вопроса по тематике ТК: {EXAMPLES[0]}\n" \
-                            f"* Пример вопроса по тематике Бизнес: {EXAMPLES[1]}\n" \
-                            f"* Пример вопроса по тематике Финансы: {EXAMPLES[2]}\n" \
-                            f"* Пример вопроса по тематике Ивенты: {EXAMPLES[3]}\n"
+                           f"* Пример вопроса по тематике Бизнес: {EXAMPLES[1]}\n" \
+                           f"* Пример вопроса по тематике Финансы: {EXAMPLES[2]}\n" \
+                           f"* Пример вопроса по тематике Ивенты: {EXAMPLES[3]}\n"
             st.markdown(instructions)
             user_input = st.text_area("question", height=100, max_chars=500, placeholder=example_input,
                                       label_visibility="collapsed")
@@ -139,7 +150,7 @@ def main(admin=None):
             # Every form must have a submit button.
             submitted = st.form_submit_button("Submit")
             if submitted:
-                # st.markdown(f"###### Вы отправили вопрос :green[{user_input}]")
+                _log_user_question(user_input=user_input, user_key=tada_key)
 
                 with st.spinner("Подождите, идет обработка запроса..."):
                     answer = get_ai_assistant_response(user_input=user_input,
@@ -153,6 +164,7 @@ def main(admin=None):
                 st.markdown(html, unsafe_allow_html=True)
 
                 st_format_ai_answer(answer)
+                _log_ai_answer(answer=answer, user_key=tada_key)
 
 
 if __name__ == "__main__":
