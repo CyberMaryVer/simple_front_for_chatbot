@@ -123,7 +123,7 @@ def main(admin=None):
                                                            tada_key=tada_key,
                                                            enrich_sources=enrich_sources)
                         _log_ai_answer(answer=answer, user_key=tada_key)
-
+                    print(answer.get("sources"))
                     html = st_create_html_chat(question=user_input,
                                                answer=answer.get("answer"),
                                                sources=answer.get("sources"))
