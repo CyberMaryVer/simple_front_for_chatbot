@@ -1,37 +1,50 @@
+import json
 import os
-
+import csv
 import streamlit as st
-from time import time
-from PIL import Image
-from utils.api_requests import get_ai_assistant_response
-from utils.html_chat import st_create_html_chat
 
-EXAMPLES = ["Какие выплаты может получить работник при увольнении?",
-            "Как получить кредит для бизнеса в Москве?",
-            "Как рассчитывается EBITDA?",
-            "Какие мероприятия для малого и среднего бизнеса проводятся в 2023 году?", ]
-
-CHAT_HI = Image.open("./img/logo-hi.jpg")
-CHAT_BUSINESS = Image.open("./img/logo-business-2.jpg")
-CHAT_TK = Image.open("./img/logo-tk-2.jpg")
-CHAT_FINANCE = Image.open("./img/logo-finance-2.jpg")
-CHAT_EVENTS = Image.open("./img/logo-events.jpg")
-LOGS = "./logs"
+from utils.api_requests import get_ai_assistant_response, get_ai_assistant_stream
+from utils.html_chat import st_create_html_chat, st_create_html_info
+from utils.metadata import CHAT_HI, CHAT_BUSINESS, CHAT_TK, CHAT_FINANCE, CHAT_EVENTS, LOGS, \
+    EXAMPLES, DESCRIPTION_BUSINESS, DESCRIPTION_TK, DESCRIPTION_FINANCE, DESCRIPTION_HR
 
 
 def _log_user_question(user_input, user_key, topic="default"):
     os.makedirs(LOGS, exist_ok=True)
-    with open(f"{LOGS}/user_questions_{user_key}.txt", "a", encoding="utf-8") as f:
-        f.write(f"USER_INPUT: {user_input}, TOPIC: {topic}\n")
+    # create csv file with header if not exists
+    if not os.path.exists(f"{LOGS}/user_questions_{user_key}.csv"):
+        with open(f"{LOGS}/user_questions_{user_key}.csv", "w", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["user_input", "topic"])
+    with open(f"{LOGS}/user_questions_{user_key}.csv", "a", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([user_input, topic])
 
 
 def _log_ai_answer(answer, user_key):
     os.makedirs(LOGS, exist_ok=True)
-    with open(f"{LOGS}/ai_answers_{user_key}.txt", "a", encoding="utf-8") as f:
-        f.write(f"{answer}\n")
+    # create csv file with header if not exists
+    if not os.path.exists(f"{LOGS}/ai_answers_{user_key}.csv"):
+        with open(f"{LOGS}/ai_answers_{user_key}.csv", "w", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["question", "answer", "sources", "topic", "elapsed_time", "uses_left"])
+    with open(f"{LOGS}/ai_answers_{user_key}.csv", "a", encoding="utf-8") as f:
+        writer = csv.writer(f)
+
+        try:
+            user_request = answer["user_request"] or {}
+            writer.writerow([user_request.get("user_input"), answer.get("answer"), answer.get("sources"),
+                             user_request.get("topic"), answer.get("elapsed_time"), answer.get("uses_left")])
+        except Exception as e:
+            with open(f"{LOGS}/errors.csv", "a", encoding="utf-8") as f:
+                writer = csv.writer(f)
+                writer.writerow([answer, e])
 
 
 def st_key_update():
+    """
+    This function updates user key
+    """
     with st.expander("Обновить ключ"):
         with st.form("key_form"):
             st.markdown("❓**Введите свой ключ**")
@@ -53,8 +66,27 @@ def st_format_ai_answer(answer):
         st.error(answer.get("error"))
         return
 
+    uses_left = answer.get("uses_left") or answer.get("key_status")
     st.write(f"Время ответа: {answer.get('elapsed_time'):.2f} сек.")
-    st.write(f"Осталось запросов: {answer.get('uses_left')}")
+    st.write(f"Осталось запросов: {uses_left}")
+
+
+def st_format_info(img_placeholder, info_placeholder, img, description):
+    """
+    This function formats info for streamlit
+    """
+    desc, info = description.split("----")
+    html = st_create_html_info(info)
+    with img_placeholder:
+        st.image(img, width=150)
+    with info_placeholder:
+        st.markdown(html, unsafe_allow_html=True)
+    with st.expander("Подробнее", expanded=True):
+        desc1, desc2 = desc.split("--")
+        html_desc1 = st_create_html_info(desc1, info_color="#ffffff", info_icon="📌", break_line=False)
+        html_desc2 = st_create_html_info(desc2, info_color="#ffffff", info_icon="📌", break_line=False)
+        st.markdown(html_desc1, unsafe_allow_html=True)
+        st.markdown(html_desc2, unsafe_allow_html=True)
 
 
 def main(admin=None):
@@ -63,7 +95,7 @@ def main(admin=None):
     :return: None
     """
 
-    col1, col2 = st.columns([3, 1])
+    col1, col2 = st.columns([5, 2])
     with col2:
         chat_img = st.empty()
         with chat_img:
@@ -74,22 +106,19 @@ def main(admin=None):
             "Помощник руководителя",
             "Финансовый консультант",
         ])
+        chat_info = st.empty()
         if chat_role == "Бизнес-консультант":
             topic = "business"
-            with chat_img:
-                st.image(CHAT_BUSINESS, width=200)
+            st_format_info(chat_img, chat_info, CHAT_BUSINESS, DESCRIPTION_BUSINESS)
         elif chat_role == "Специалист по ТК":
             topic = "tk"
-            with chat_img:
-                st.image(CHAT_TK, width=200)
+            st_format_info(chat_img, chat_info, CHAT_TK, DESCRIPTION_TK)
         elif chat_role == "Финансовый консультант":
             topic = chat_role
-            with chat_img:
-                st.image(CHAT_FINANCE, width=200)
+            st_format_info(chat_img, chat_info, CHAT_FINANCE, DESCRIPTION_FINANCE)
         elif chat_role == "Помощник руководителя":
             topic = "hr"
-            with chat_img:
-                st.image(CHAT_EVENTS, width=200)
+            st_format_info(chat_img, chat_info, CHAT_EVENTS, DESCRIPTION_HR)
         else:
             topic = chat_role
         st.markdown("----")
@@ -99,11 +128,12 @@ def main(admin=None):
     with col1:
         with st.form("my_form"):
             st.markdown("❓**Введите свой вопрос**")
-            example_input = EXAMPLES[0]
+            example_input = EXAMPLES[0] if topic == "tk" else EXAMPLES[1] if topic == "business" else \
+                EXAMPLES[3] if topic == "hr" else EXAMPLES[2]
             instructions = f"* Пример вопроса по тематике ТК: {EXAMPLES[0]}\n" \
                            f"* Пример вопроса по тематике Бизнес: {EXAMPLES[1]}\n" \
-                           f"* Пример вопроса по тематике Финансы: {EXAMPLES[2]}\n" \
-                           f"* Пример вопроса по тематике Управление: {EXAMPLES[3]}\n"
+                           f"* Пример вопроса по тематике Управление: {EXAMPLES[3]}\n" \
+                           f"* Пример вопроса по тематике Финансы: {EXAMPLES[2]}\n"
             st.markdown(instructions)
             user_input = st.text_area("question", height=100, max_chars=500, placeholder=example_input,
                                       label_visibility="collapsed")

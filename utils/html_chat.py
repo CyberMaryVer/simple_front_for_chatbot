@@ -1,6 +1,7 @@
 USER_ICON = "https://nregsmp.org/eService/images/User.png"
 CHAT_ICON = "https://raw.githubusercontent.com/CyberMaryVer/ai_assistant/master/images/logo.jpg"
 INFO_ICON = "https://cdn-icons-png.flaticon.com/512/813/813776.png"
+AI_ICON = "https://cdn-icons-png.flaticon.com/512/220/220334.png"
 
 
 def st_create_html_chat(question, answer, sources,
@@ -40,7 +41,7 @@ def st_create_html_chat(question, answer, sources,
                     source_text = source_text[:50] + "..."
                 sources_html += f"<a href='{source_href}' target='_blank'>{source_text}</a><br>"
         html += f"<div style='display: flex; flex-direction: row; justify-content: flex-end; align-items: center;'>" \
-                f"<img src='{info_icon}' style='width: 80px; height: 80px;'>" \
+                f"<img src='{info_icon}' style='width: 60px; height: 60px;'>" \
                 f"<div style='display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-end;'>" \
                 f"<div style='margin: 10px;'>" \
                 f"{sources_html}" \
@@ -50,11 +51,34 @@ def st_create_html_chat(question, answer, sources,
     except Exception as e:
         print(f"[{__name__}] Error decoding: {e}")
         html += f"<div style='display: flex; flex-direction: row; justify-content: flex-end; align-items: center;'>" \
-                f"<img src='{info_icon}' style='width: 80px; height: 80px;'>" \
+                f"<img src='{info_icon}' style='width: 60px; height: 60px;'>" \
                 f"<div style='display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-end;'>" \
                 f"<div style='margin: 10px;'>" \
                 f"Не удалось отобразить источники информации" \
                 f"</div>" \
                 f"</div>" \
                 f"</div>"
+    html += f"<hr>"
+    return html
+
+
+def st_create_html_info(info_text,
+                        info_color='#f0f2f6',
+                        font_color='#333333',
+                        font_size='16px',
+                        info_icon="info",
+                        break_line=True):
+    info_icon_src = INFO_ICON if info_icon == "info" else AI_ICON
+
+    html = ""
+    html += f"<div style='display: flex; flex-direction: row; justify-content: flex-start; align-items: center;'>"
+    html += f"<div style='display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-start;'>"
+    html += f"<div style='margin: 10px; padding: 10px; border: 2px solid {info_color}; background-color: {info_color}; color: {font_color}; border-radius: 5px; font-size: {font_size};'>"
+    html += f"<img src='{info_icon_src}' style='width: 20px; height: 20px; margin-right: 10px; vertical-align: middle;'/>"
+    html += f"<span style='font-weight: normal;'>{info_text}</span>"
+    html += f"</div>"
+    html += f"</div>"
+    html += f"</div>"
+    html += f"<hr>" if break_line else ""
+
     return html

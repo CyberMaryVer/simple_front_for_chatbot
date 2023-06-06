@@ -4,7 +4,7 @@ import os
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
-from utils.st_constants import API_URL, PUBLIC_URL, REQUEST_ASSISTANT
+from utils.st_constants import API_URL, PUBLIC_URL, REQUEST_ASSISTANT, REQUEST_CHATBOT, REQUEST_STREAM
 
 retry_strategy1 = Retry(
     total=5,
@@ -69,23 +69,32 @@ def request_api(request, strategy='retry_strategy1', **params):
         raise Exception(f"Request failed with status code {response.status_code}: {response.text}")
 
 
-def get_ai_assistant_response(user_input, user_id=0,
-                              topic="business",
-                              enrich_sources=True,
-                              tada_key="12345test",
-                              api=API_URL,
-                              endpoint=REQUEST_ASSISTANT):
-    print(SysColors.CYAN, "Requesting...", API_URL + REQUEST_ASSISTANT, SysColors.END)
-    print(SysColors.CYAN, "User input:", user_input, SysColors.END)
-    role = "" if topic in ["business", "tk"] else topic
-    topic = topic if topic in ["business", "tk", "hr"] else "other"
-    if topic == "other":
-        user_input = f"Ты - опытный {role}. Подробно ответь на вопрос:\n{user_input}"
-    request_url = f"{api}{endpoint}{user_id}"
-    headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-    }
+def improve_user_request(user_input, role="Финансовый консультант"):
+    # if user asks how to calculate something, add role to the question
+    patterns = ["как рассчитать", "как посчитать", "как найти", "как определить", "расчет", "подсчет", "вычисление",
+                "как узнать", "как вычислить", "как подсчитать", "как рассчитывается", "как определяется",
+                "как определяются", "как рассчитываются", "как вычисляется", "как подсчитывается", "как найти", ]
+    is_calculation = any([pattern in user_input.lower() for pattern in patterns])
+    if is_calculation:
+        user_input = f"Ты - опытный экономист. Ответь на вопрос, расписав свой ответ по шагам, " \
+                     f"если нужно - приведи соответствующие формулыю" \
+                     f"\n\nВОПРОС\n {user_input}\n\nОТВЕТ ЭКСПЕРТА\n"
+        return user_input
+
+    # if user asks about taxes, add role to the question
+    patterns = ["налог", "енп", "ндс", "ндфл", "патент", "налогооблож"]
+    is_tax = any([pattern in user_input.lower() for pattern in patterns])
+    if is_tax:
+        user_input = f"Ты - налоговый консультант. Подробно ответь на вопрос, разбив ответ на подпункты" \
+                     f"\n\nВОПРОС\n {user_input}\n\nОТВЕТ ЭКСПЕРТА\n"
+        return user_input
+
+    user_input = f"Ты - опытный {role}. Дай полный, точный и развернутый ответ на вопрос." \
+                 f"\n\nВОПРОС\n {user_input}\n\nОТВЕТ ЭКСПЕРТА\n"
+    return user_input
+
+
+def create_request_data(user_input, tada_key, topic, enrich_sources):
     data = {
         "user_input": user_input,
         "params": {
@@ -93,6 +102,15 @@ def get_ai_assistant_response(user_input, user_id=0,
             "topic": topic,
             "enrich_sources": enrich_sources
         }
+    }
+    return data
+
+
+def request_api_endpoint(endpoint, data, user_id=0, ):
+    request_url = f"{API_URL}{endpoint}{user_id}"
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
     }
     print(SysColors.CYAN, "Requesting...", request_url, SysColors.END)
     response = requests.post(request_url, headers=headers, data=json.dumps(data))
@@ -103,11 +121,49 @@ def get_ai_assistant_response(user_input, user_id=0,
         raise Exception(f"Request failed with status code {response.status_code}: {response.text}")
 
 
+def get_ai_assistant_response(user_input, user_id=0,
+                              topic="business",
+                              enrich_sources=True,
+                              tada_key="12345test",
+                              endpoint=REQUEST_ASSISTANT):
+    print(SysColors.CYAN, "Requesting...", API_URL + REQUEST_ASSISTANT, SysColors.END)
+    print(SysColors.CYAN, "User input:", user_input, SysColors.END)
+    role = "" if topic in ["business", "tk"] else topic
+    topic = topic if topic in ["business", "tk", "hr"] else "other"
+    if topic == "other":
+        endpoint = REQUEST_CHATBOT
+        user_input = improve_user_request(user_input, role=role)
+    data = create_request_data(user_input, tada_key, topic, enrich_sources)
+    response = request_api_endpoint(endpoint, data, user_id=user_id)
+    return response
+
+
+def get_ai_assistant_stream(user_input, user_id=0,
+                            topic="business",
+                            enrich_sources=True,
+                            tada_key="12345test",
+                            endpoint=REQUEST_STREAM):
+    # TODO: fix stream request
+    request_url = f"{API_URL}{endpoint}{user_id}"
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    }
+    print(SysColors.CYAN, "Requesting...", request_url, SysColors.END)
+    data = create_request_data(user_input, tada_key, topic, enrich_sources)
+    response = requests.post(request_url, headers=headers, data=json.dumps(data), stream=True)
+    for line in response.iter_lines():
+        print(SysColors.CYAN, "Response:", line, SysColors.END)
+        if line:
+            yield line
+
+
 if __name__ == "__main__":
     # Healthcheck
     print(SysColors.GREEN, healthcheck(), SysColors.END)
     # Usage
     import json
+
     question1 = "Какие услуги предоставляет МТС?"
     question2 = "сколько зарабатывает программист в месяц в саратове?"
     answer = get_ai_assistant_response(user_input=question1, user_id=33)

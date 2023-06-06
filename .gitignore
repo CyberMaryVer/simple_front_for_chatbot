@@ -1,3 +1,5 @@
 venv/
 logs/
+.idea/
 *.pyc
+.streamlit/secrets.toml

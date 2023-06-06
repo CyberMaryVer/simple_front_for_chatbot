@@ -2,9 +2,9 @@ import streamlit as st
 import streamlit_authenticator as stauth
 import re
 
-ADMINS = ["mary"]
-USERNAMES = ["admin", "user", "mary"]
-PASSWORDS = ["admin", "user", "1609"]
+ADMINS = [st.secrets["ADMIN"],]
+USERNAMES = ["admin", "user", st.secrets["ADMIN"]]
+PASSWORDS = ["admin", "user", st.secrets["PASSWORD"]]
 
 
 class SysColors:
