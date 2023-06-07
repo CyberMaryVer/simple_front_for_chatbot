@@ -126,10 +126,12 @@ def get_ai_assistant_response(user_input, user_id=0,
                               enrich_sources=True,
                               tada_key="12345test",
                               endpoint=REQUEST_ASSISTANT):
+    role = "" if topic in ["business", "tk", "business+hr", "yt"] else topic
+    topic = topic if topic in ["business", "tk", "hr", "business+hr", "yt"] else "other"
+
     print(SysColors.CYAN, "Requesting...", API_URL + REQUEST_ASSISTANT, SysColors.END)
-    print(SysColors.CYAN, "User input:", user_input, SysColors.END)
-    role = "" if topic in ["business", "tk"] else topic
-    topic = topic if topic in ["business", "tk", "hr"] else "other"
+    print(SysColors.CYAN, "User input:", user_input, "Topic:", topic, SysColors.END)
+
     if topic == "other":
         endpoint = REQUEST_CHATBOT
         user_input = improve_user_request(user_input, role=role)

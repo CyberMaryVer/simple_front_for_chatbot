@@ -46,7 +46,7 @@ with st.sidebar:
                          key="1")
 
 if tabs == 'Chat':
-    st.markdown("## Chat")
+    st.markdown("## Tada.Chat")
     demo(admin=True)
 
 elif tabs == 'Login':

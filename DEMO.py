@@ -6,7 +6,8 @@ import streamlit as st
 from utils.api_requests import get_ai_assistant_response, get_ai_assistant_stream
 from utils.html_chat import st_create_html_chat, st_create_html_info
 from utils.metadata import CHAT_HI, CHAT_BUSINESS, CHAT_TK, CHAT_FINANCE, CHAT_EVENTS, LOGS, \
-    EXAMPLES, DESCRIPTION_BUSINESS, DESCRIPTION_TK, DESCRIPTION_FINANCE, DESCRIPTION_HR
+    EXAMPLES_TK, EXAMPLES_B, EXAMPLES_C, EXAMPLES_F, \
+    DESCRIPTION_BUSINESS, DESCRIPTION_TK, DESCRIPTION_FINANCE, DESCRIPTION_HR
 
 
 def _log_user_question(user_input, user_key, topic="default"):
@@ -108,7 +109,7 @@ def main(admin=None):
         ])
         chat_info = st.empty()
         if chat_role == "Бизнес-консультант":
-            topic = "business"
+            topic = "business+hr"
             st_format_info(chat_img, chat_info, CHAT_BUSINESS, DESCRIPTION_BUSINESS)
         elif chat_role == "Специалист по ТК":
             topic = "tk"
@@ -117,7 +118,7 @@ def main(admin=None):
             topic = chat_role
             st_format_info(chat_img, chat_info, CHAT_FINANCE, DESCRIPTION_FINANCE)
         elif chat_role == "Помощник руководителя":
-            topic = "hr"
+            topic = "yt"
             st_format_info(chat_img, chat_info, CHAT_EVENTS, DESCRIPTION_HR)
         else:
             topic = chat_role
@@ -128,19 +129,23 @@ def main(admin=None):
     with col1:
         with st.form("my_form"):
             st.markdown("❓**Введите свой вопрос**")
-            example_input = EXAMPLES[0] if topic == "tk" else EXAMPLES[1] if topic == "business" else \
-                EXAMPLES[3] if topic == "hr" else EXAMPLES[2]
-            instructions = f"* Пример вопроса по тематике ТК: {EXAMPLES[0]}\n" \
-                           f"* Пример вопроса по тематике Бизнес: {EXAMPLES[1]}\n" \
-                           f"* Пример вопроса по тематике Управление: {EXAMPLES[3]}\n" \
-                           f"* Пример вопроса по тематике Финансы: {EXAMPLES[2]}\n"
+            examples = EXAMPLES_TK if topic == "tk" else EXAMPLES_B if topic == "business+hr" else \
+                EXAMPLES_C if topic == "yt" else EXAMPLES_F
+            example_input = examples[0] if topic == "tk" else examples[1] if topic == "business+hr" else \
+                examples[3] if topic == "yt" else examples[2]
+            instructions = f"* Пример вопроса по тематике: {examples[0]}\n" \
+                           f"* Пример вопроса по тематике: {examples[1]}\n" \
+                           f"* Пример вопроса по тематике: {examples[3]}\n" \
+                           f"* Пример вопроса по тематике: {examples[2]}\n"
             st.markdown(instructions)
             user_input = st.text_area("question", height=100, max_chars=500, placeholder=example_input,
                                       label_visibility="collapsed")
             tada_key = st.session_state.get("tada_key") or "12345test"
-            enrich_sources = True if topic == "tk" else False
 
-            # Every form must have a submit button.
+            # Enrich sources and enhance text for TK, YouTube
+            enrich_sources = True if topic == "tk" else False
+            enhance_text = True if topic == "yt" else False
+
             submitted = st.form_submit_button("Submit")
             if submitted:
                 _log_user_question(user_input=user_input, user_key=tada_key, topic=topic)
@@ -156,7 +161,8 @@ def main(admin=None):
                     print(answer.get("sources"))
                     html = st_create_html_chat(question=user_input,
                                                answer=answer.get("answer"),
-                                               sources=answer.get("sources"))
+                                               sources=answer.get("sources"),
+                                               enhance_text=enhance_text)
                     st.markdown(html, unsafe_allow_html=True)
 
                     st_format_ai_answer(answer)

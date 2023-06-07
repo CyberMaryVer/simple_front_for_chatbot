@@ -4,10 +4,21 @@ INFO_ICON = "https://cdn-icons-png.flaticon.com/512/813/813776.png"
 AI_ICON = "https://cdn-icons-png.flaticon.com/512/220/220334.png"
 
 
+def _enhance_text(text):
+    # temp function
+    text = text.replace("🔸", "<br>🔸")
+    text = text.replace("<<", "<b>")
+    text = text.replace(">>", "</b>")
+    text = text.replace(" ⧸ ", "/")
+    return text
+
+
 def st_create_html_chat(question, answer, sources,
                         user_icon=USER_ICON,
                         chat_icon=CHAT_ICON,
-                        info_icon=INFO_ICON):
+                        info_icon=INFO_ICON,
+                        enhance_text=False):
+    answer = _enhance_text(answer) if enhance_text else answer
     html = ""
     html += f"<div style='display: flex; flex-direction: row; justify-content: flex-start; align-items: center;'>" \
             f"<img src='{user_icon}' style='width: 80px; height: 80px; border-radius: 50%;'>" \
